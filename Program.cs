@@ -1,19 +1,47 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Formatting.Json;
+using System;
+using System.IO;
 
 namespace Logging
 {
     public class Program
     {
+        /* https://github.com/serilog/serilog-aspnetcore
+         * https://github.com/serilog/serilog-settings-configuration : Configuration is read from the Serilog section in appsettings.json
+         * https://github.com/serilog/serilog-sinks-file
+         */
+
+        public static IConfiguration Configuration { get; } = new ConfigurationBuilder()
+                                                                .SetBasePath(Directory.GetCurrentDirectory())
+                                                                .AddJsonFile(path: "appsettings.json", optional: false, reloadOnChange: true)
+                                                                .AddEnvironmentVariables()
+                                                                .Build();
+
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            // configure serilog to read from the configuration file (appsettings.json)
+            Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(Configuration)
+            .WriteTo.File(new JsonFormatter(), path: @"c:\temp\logs\loggingTesting.json", shared: true)
+            .CreateLogger();
+
+            try
+            {
+                Log.Information("Starting web host");
+                CreateHostBuilder(args).Build().Run();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Host terminated unexpectedly");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         /**
@@ -26,6 +54,7 @@ namespace Logging
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                });
+                })
+                .UseSerilog();
     }
 }
