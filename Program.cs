@@ -16,6 +16,11 @@ namespace Logging
             CreateHostBuilder(args).Build().Run();
         }
 
+        /**
+         *  CreateDefaultBuilder() adds the following logging providers by default: Console, Debug, EventSource and EventLog(only Windows)
+         *  A logging provider displays or stores logs.
+         *  https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-3.0
+         **/
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>

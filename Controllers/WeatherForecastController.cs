@@ -26,7 +26,12 @@ namespace Logging.Controllers
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
+
+            _logger.LogInformation("Hello from the home");
+
             var rng = new Random();
+
+            _logger.LogInformation(message: $"Returning Weather forecast to user using: {HttpContext.Request.Protocol}");
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),
