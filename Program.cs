@@ -21,6 +21,7 @@ namespace Logging
                                                                 .AddEnvironmentVariables()
                                                                 .Build();
 
+
         public static void Main(string[] args)
         {
             // configure serilog to read from the configuration file (appsettings.json)
